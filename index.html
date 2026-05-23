@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Imposter Who? — The Free Word Deduction Party Game</title>
+
+<!-- ═══ SEO & AI DISCOVERABILITY ═══ -->
+<meta name="description" content="Imposter Who? is a free browser-based word social deduction party game. One player secretly gets a clue word while everyone else knows the secret — find the imposter before they blend in!">
+<meta name="keywords" content="imposter game, word game, party game, social deduction, free online game, who is the imposter, group game, friends game, imposter who">
+<meta name="author" content="Imposter Who?">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://imposter-who.vercel.app/">
+
+<!-- Open Graph (WhatsApp, iMessage, Facebook, Discord link previews) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://imposter-who.vercel.app/">
+<meta property="og:title" content="Imposter Who? — Free Party Word Game">
+<meta property="og:description" content="One player gets a clue, everyone else knows the secret word. Say one word, find the imposter — free, no download, play instantly with friends.">
+<meta property="og:image" content="https://imposter-who.vercel.app/Imposter_logo_1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Imposter Who?">
+
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Imposter Who? — Free Party Word Game">
+<meta name="twitter:description" content="One player gets a clue, everyone else knows the secret word. Find the imposter — free, instant, no app needed.">
+<meta name="twitter:image" content="https://imposter-who.vercel.app/Imposter_logo_1.png">
+
+<!-- JSON-LD Structured Data (read by Google & AI engines) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Imposter Who?",
+  "url": "https://imposter-who.vercel.app/",
+  "description": "A free browser-based word social deduction party game. One player secretly receives a clue word while all others see the secret word. Players take turns saying related words and vote to find the imposter.",
+  "applicationCategory": "Game",
+  "genre": ["Party Game", "Word Game", "Social Deduction"],
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires a modern web browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "inLanguage": ["en", "he"],
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "Everyone, families, friend groups, party players"
+  },
+  "featureList": [
+    "No download required",
+    "Free to play",
+    "Supports English and Hebrew",
+    "8 word categories",
+    "Up to 12 players",
+    "Private card reveal with hold mechanic"
+  ]
+}
+</script>
+<!-- ═══════════════════════════════════ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Barlow+Condensed:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --bg: #080808;
+  --surface: #111111;
+  --surface-raised: #1A1A1A;
+  --surface-float: #222222;
+  --lime: #CC1111;
+  --imposter-bg1: #BB0000;
+  --imposter-bg2: #7A0000;
+  --regular-bg1: #F2F2F2;
+  --regular-bg2: #D8D8D8;
+  --red: #CC1111;
+  --text: #FFFFFF;
+  --muted: #606060;
+  --muted-light: #999999;
+  --border: rgba(255,255,255,0.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+input,textarea{-webkit-user-select:text;user-select:text}
+body *{-webkit-user-select:none;user-select:none}
+input{-webkit-user-select:text;user-select:text}
+
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.screen{display:none;min-height:100vh;position:relative;z-index:1}
+.screen.active{display:flex;flex-direction:column}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.screen.active{animation:slideUp .35s cubic-bezier(.4,0,.2,1)}
+
+/* ── HOME ── */
+#screen-home{background:var(--bg)}
+#screen-home::before{content:'';position:fixed;top:-60px;left:50%;transform:translateX(-50%);width:480px;height:480px;background:radial-gradient(circle,rgba(204,17,17,.08) 0%,transparent 65%);pointer-events:none;z-index:0}
+.home-wrap{padding:0 16px calc(120px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;max-width:520px;margin:0 auto;width:100%;position:relative;z-index:1}
+
+.home-top{padding:32px 16px 20px;text-align:center;position:relative;max-width:520px;margin:0 auto;width:100%;z-index:1}
+.logo-badge{display:inline-block;background:var(--lime);color:#000;font-family:'Bungee',sans-serif;font-size:12px;line-height:1.15;padding:7px 11px;border-radius:10px;text-align:center;box-shadow:0 0 32px rgba(204,17,17,.4),0 4px 14px rgba(0,0,0,.5);margin-bottom:14px}
+.main-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(52px,14vw,76px);line-height:.9;letter-spacing:-.02em;text-transform:uppercase;margin:0}
+.main-title .accent{color:var(--lime)}
+.tagline{color:var(--muted-light);font-size:14px;margin-top:10px;font-weight:500}
+.help-btn{position:absolute;top:20px;right:16px;width:44px;height:44px;border-radius:50%;background:var(--surface-raised);border:1px solid var(--border);color:var(--muted-light);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease}
+.help-btn:hover{background:var(--surface-float);color:var(--text)}
+.help-btn:active{transform:scale(.9)}
+
+/* lang switcher */
+.lang-row{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.lang-btn{padding:7px 16px;border-radius:100px;background:var(--surface-raised);border:1.5px solid var(--border);color:var(--muted-light);font-size:13px;font-weight:700;cursor:pointer;transition:all .18s ease;font-family:'Plus Jakarta Sans',sans-serif}
+.lang-btn:hover{border-color:rgba(204,17,17,.3);color:var(--text)}
+.lang-btn.active{background:rgba(204,17,17,.1);border-color:var(--lime);color:var(--lime)}
+.lang-btn:active{transform:scale(.95)}
+
+/* RTL overrides */
+[dir="rtl"] .help-btn{right:auto;left:16px}
+[dir="rtl"] .x-btn{right:auto;left:16px}
+[dir="rtl"] .main-title{font-family:'Heebo',sans-serif;letter-spacing:0;text-transform:none;direction:ltr}
+[dir="rtl"] .card-title{font-family:'Heebo',sans-serif;letter-spacing:0}
+[dir="rtl"] .game-title{font-family:'Heebo',sans-serif;letter-spacing:0}
+[dir="rtl"] .role-title{font-family:'Heebo',sans-serif;letter-spacing:0}
+[dir="rtl"] .role-word{font-family:'Heebo',sans-serif;letter-spacing:0}
+[dir="rtl"] .modal-title{font-family:'Heebo',sans-serif;letter-spacing:0;text-transform:none}
+[dir="rtl"] .btn-primary,[dir="rtl"] .btn-danger,[dir="rtl"] .btn-secondary,[dir="rtl"] .btn-next{font-family:'Heebo',sans-serif;letter-spacing:0;text-transform:none}
+[dir="rtl"] .tag{font-family:'Heebo',sans-serif;letter-spacing:0;text-transform:none}
+[dir="rtl"] .results-label{font-family:'Heebo',sans-serif;letter-spacing:0;text-transform:none}
+[dir="rtl"] .toggle-label,[dir="rtl"] .counter-desc{font-family:'Heebo',sans-serif}
+[dir="rtl"] .logo-badge{font-family:'Heebo',sans-serif;font-size:11px}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px 18px}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.card-icon{font-size:20px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-light)}
+.card-count{margin-left:auto;font-size:13px;color:var(--muted);font-weight:500}
+
+/* players */
+.player-list{display:flex;flex-direction:column;gap:8px}
+.player-row{display:flex;align-items:center;gap:8px}
+.player-num{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--muted);width:22px;text-align:center;flex-shrink:0}
+.player-input{flex:1;background:var(--surface-raised);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:500;outline:none;transition:border-color .2s,box-shadow .2s}
+.player-input::placeholder{color:var(--muted)}
+.player-input:focus{border-color:rgba(204,17,17,.45);box-shadow:0 0 0 3px rgba(204,17,17,.1)}
+.btn-rm{width:44px;height:44px;border-radius:12px;background:rgba(255,64,96,.12);border:1px solid rgba(255,64,96,.2);color:var(--red);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s ease}
+.btn-rm:hover{background:rgba(255,64,96,.22)}
+.btn-rm:active{transform:scale(.9)}
+.btn-add{width:100%;padding:10px;background:transparent;border:1.5px dashed rgba(204,17,17,.3);border-radius:12px;color:var(--lime);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;transition:all .2s ease}
+.btn-add:hover{background:rgba(204,17,17,.06);border-color:rgba(204,17,17,.5)}
+.btn-add:active{transform:scale(.98)}
+
+/* categories */
+.cat-grid{display:flex;flex-wrap:wrap;gap:7px}
+.cat-pill{padding:8px 13px;border-radius:100px;background:var(--surface-raised);border:1.5px solid var(--border);color:var(--muted-light);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s ease;display:flex;align-items:center;gap:5px}
+.cat-pill:hover{border-color:rgba(204,17,17,.3);color:var(--text)}
+.cat-pill:active{transform:scale(.95)}
+.cat-pill.sel{background:rgba(204,17,17,.1);border-color:var(--lime);color:var(--lime)}
+
+/* counter */
+.row-between{display:flex;align-items:center;justify-content:space-between}
+.counter-desc{color:var(--muted-light);font-size:14px;font-weight:500;flex:1}
+.counter-ctrl{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.btn-cnt{width:44px;height:44px;border-radius:50%;background:var(--surface-raised);border:1px solid var(--border);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;transition:all .15s ease;line-height:1}
+.btn-cnt:hover{background:var(--surface-float);border-color:rgba(255,255,255,.2)}
+.btn-cnt:active{transform:scale(.88)}
+.cnt-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;min-width:28px;text-align:center}
+
+/* toggle */
+.toggle-row{display:flex;align-items:center;gap:12px}
+.toggle-info{flex:1}
+.toggle-label{font-weight:600;font-size:15px;margin-bottom:2px}
+.toggle-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.toggle{position:relative;width:50px;height:28px;background:var(--surface-raised);border-radius:100px;cursor:pointer;transition:background .25s ease;flex-shrink:0;border:1px solid var(--border)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:var(--muted);border-radius:50%;transition:all .28s cubic-bezier(.34,1.56,.64,1)}
+.toggle.on{background:rgba(204,17,17,.18);border-color:rgba(204,17,17,.4)}
+.toggle.on::after{left:25px;background:var(--lime)}
+
+/* bottom bar */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px max(20px,env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 65%,transparent);z-index:200}
+.bottom-bar-inner{max-width:520px;margin:0 auto}
+.btn-primary{width:100%;padding:18px;background:var(--lime);color:#fff;border:none;border-radius:18px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 28px rgba(204,17,17,.35),0 2px 8px rgba(0,0,0,.5);transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(204,17,17,.45),0 4px 12px rgba(0,0,0,.4)}
+.btn-primary:active{transform:scale(.97) translateY(1px);box-shadow:0 2px 14px rgba(204,17,17,.25)}
+
+/* ── REVEAL SCREEN ── */
+#screen-reveal{background:var(--bg);align-items:center;justify-content:center;padding:20px 20px calc(100px + env(safe-area-inset-bottom));gap:18px}
+.x-btn{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--muted-light);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease;z-index:300}
+.x-btn:hover{background:rgba(255,255,255,.14);color:var(--text)}
+.x-btn:active{transform:scale(.88)}
+
+.reveal-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(40px,12vw,62px);text-transform:uppercase;letter-spacing:-.01em;text-align:center;line-height:1}
+.reveal-hint{font-size:14px;color:var(--muted-light);font-weight:500;text-align:center;margin-top:4px}
+
+/* The card */
+.card-wrap{position:relative;width:100%;max-width:360px}
+.rev-card{width:100%;aspect-ratio:5/3;border-radius:22px;position:relative;overflow:hidden;touch-action:none;cursor:pointer}
+
+/* role content (behind shutter) */
+.role-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;border-radius:22px}
+.role-face.imp{background:linear-gradient(135deg,var(--imposter-bg1),var(--imposter-bg2))}
+.role-face.reg{background:linear-gradient(135deg,var(--regular-bg1),var(--regular-bg2))}
+.role-title{font-family:'Bungee',sans-serif;font-size:clamp(20px,6vw,28px);color:#000;text-transform:uppercase;line-height:1.1}
+.role-sub{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:rgba(0,0,0,.55);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+.role-word{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(34px,10vw,50px);color:#000;text-transform:uppercase;letter-spacing:-.02em;margin-top:8px;line-height:1}
+.role-clue-note{font-size:12px;color:rgba(0,0,0,.55);font-weight:600;margin-top:6px}
+.role-face.imp .role-title{color:#fff}
+.role-face.imp .role-sub{color:rgba(255,255,255,.65)}
+.role-face.imp .role-word{color:#fff}
+.role-face.imp .role-clue-note{color:rgba(255,255,255,.65)}
+
+/* shutter strips container */
+.shutter{position:absolute;inset:0;border-radius:22px;overflow:hidden;pointer-events:none}
+.s-strip{position:absolute;left:0;right:0;background:var(--surface-raised);transform-origin:top center;transition:none}
+.s-strip::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:rgba(255,255,255,.04)}
+
+/* card front overlay */
+.card-front{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:10;border-radius:22px;background:transparent;transition:opacity .3s ease;border:1px solid var(--border)}
+.card-front.gone{opacity:0;pointer-events:none}
+.ring-wrap{position:relative;width:68px;height:68px}
+.ring-wrap .icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px}
+.ring-wrap svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:3}
+.ring-fill{fill:none;stroke:var(--lime);stroke-width:3;stroke-linecap:round;stroke-dasharray:201;stroke-dashoffset:201;transition:stroke-dashoffset .04s linear}
+.hold-text{font-weight:700;font-size:15px;color:var(--muted-light);text-align:center}
+.hold-sub{font-size:12px;color:var(--muted);text-align:center}
+
+@keyframes ringPulse{0%,100%{box-shadow:0 0 0 0 rgba(204,17,17,.3)}50%{box-shadow:0 0 0 14px rgba(204,17,17,0)}}
+.holding .ring-wrap .icon{animation:ringPulse 1.2s infinite}
+
+/* dots */
+.dots-row{display:flex;gap:8px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s ease;flex-shrink:0}
+.dot.done{background:var(--lime)}
+.dot.cur{background:var(--text);transform:scale(1.45)}
+
+/* next btn */
+.btn-next{padding:15px 36px;background:var(--surface-raised);border:1.5px solid var(--border);border-radius:100px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.btn-next:hover{background:var(--surface-float);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
+.btn-next:active{transform:scale(.96)}
+
+/* ── GAME SCREEN ── */
+#screen-game{align-items:center;justify-content:center;padding:24px 24px calc(24px + env(safe-area-inset-bottom));gap:20px;text-align:center;background:var(--bg)}
+.game-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(44px,13vw,64px);text-transform:uppercase;letter-spacing:-.02em;line-height:.95}
+.game-sub{color:var(--muted-light);font-size:14px;line-height:1.65;margin-top:10px}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;background:rgba(204,17,17,.1);border:1px solid rgba(204,17,17,.25);border-radius:100px;font-size:12px;font-weight:700;color:var(--lime);text-transform:uppercase;letter-spacing:.08em}
+.players-mini{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.p-chip{padding:7px 15px;background:var(--surface-raised);border:1px solid var(--border);border-radius:100px;font-size:14px;font-weight:600}
+
+.btn-danger{width:100%;max-width:400px;padding:18px;background:var(--red);color:#fff;border:none;border-radius:18px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 28px rgba(255,64,96,.35);transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.btn-danger:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(255,64,96,.45)}
+.btn-danger:active{transform:scale(.97)}
+
+/* ── RESULTS SCREEN ── */
+#screen-results{align-items:center;justify-content:center;padding:24px 24px calc(24px + env(safe-area-inset-bottom));gap:18px;text-align:center;background:var(--bg)}
+.results-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted-light)}
+.imposter-name{font-family:'Bungee',sans-serif;font-size:clamp(28px,8vw,44px);color:var(--red);line-height:1.1;margin-top:4px}
+.result-word{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(52px,15vw,80px);letter-spacing:-.02em;text-transform:uppercase;line-height:1}
+.result-clue{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;color:var(--text);margin-top:6px}
+.btn-secondary{width:100%;max-width:400px;padding:16px;background:transparent;border:1.5px solid var(--border);border-radius:18px;color:var(--muted-light);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .2s ease}
+.btn-secondary:hover{background:var(--surface);border-color:rgba(255,255,255,.2);color:var(--text)}
+.btn-secondary:active{transform:scale(.97)}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:26px;max-width:400px;width:100%;position:relative}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:26px;text-transform:uppercase;margin-bottom:16px}
+.modal-x{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--border);color:var(--muted-light);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s ease}
+.modal-x:hover{background:rgba(255,255,255,.14)}
+.modal-x:active{transform:scale(.9)}
+.modal p{color:var(--muted-light);font-size:14px;line-height:1.7;margin-bottom:12px}
+.modal p strong{color:var(--lime);font-weight:700}
+
+/* toast */
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:rgba(24,24,48,.95);color:#fff;padding:11px 20px;border-radius:100px;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,.1);z-index:9999;white-space:nowrap;animation:toastIn .25s ease;backdrop-filter:blur(10px)}
+
+/* shake */
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.shake{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
+
+::-webkit-scrollbar{display:none}
+body{-ms-overflow-style:none;scrollbar-width:none}
+
+/* ── BRAND LOGO ── */
+@keyframes logoReveal{from{opacity:0;transform:scale(.82) translateY(-14px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.logo-img{display:block;width:clamp(260px,78vw,340px);margin:0 auto 2px;animation:logoReveal .75s cubic-bezier(.34,1.3,.64,1) both}
+.logo-img-mini{display:block;height:44px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HOME SCREEN ═══════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="home-top">
+    <button class="help-btn" onclick="openModal('how-to-play')">?</button>
+    <img src="/ce8ce513-d59c-4ed8-ad1b-b952f2996e06_removalai_preview.png" class="logo-img" alt="IMPOSTER">
+    <p class="tagline" id="el-tagline">The word game where one of you is lying.</p>
+    <div class="lang-row">
+      <button class="lang-btn active" id="lang-en" onclick="switchLang('en')">🇺🇸 EN</button>
+      <button class="lang-btn" id="lang-he" onclick="switchLang('he')">🇮🇱 עב</button>
+    </div>
+  </div>
+
+  <div class="home-wrap">
+    <!-- Players -->
+    <div class="card" id="players-card">
+      <div class="card-header">
+        <div class="card-icon">✋</div>
+        <div class="card-title" id="el-players-title">Players</div>
+        <div class="card-count" id="player-count-lbl">0 players</div>
+      </div>
+      <div class="player-list" id="player-list"></div>
+      <button class="btn-add" id="btn-add" onclick="addPlayer()">
+        <span style="font-size:18px;line-height:1">+</span> <span id="el-add-text">Add Player</span>
+      </button>
+    </div>
+
+    <!-- Categories -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🎯</div>
+        <div class="card-title" id="el-cats-title">Word Categories</div>
+      </div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+
+    <!-- Imposters -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🕵️</div>
+        <div class="card-title" id="el-imps-title">Imposters</div>
+      </div>
+      <div class="row-between">
+        <div class="counter-desc" id="el-imps-desc">Number of imposters per round</div>
+        <div class="counter-ctrl">
+          <button class="btn-cnt" id="btn-imp-minus" onclick="changeImp(-1)">−</button>
+          <span class="cnt-val" id="imp-val">1</span>
+          <button class="btn-cnt" id="btn-imp-plus" onclick="changeImp(1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hint Toggle -->
+    <div class="card">
+      <div class="toggle-row">
+        <div class="card-icon">💡</div>
+        <div class="toggle-info">
+          <div class="toggle-label" id="el-hint-label">Imposter Hint</div>
+          <div class="toggle-desc" id="el-hint-desc">Give the imposter a related clue word to help blend in.</div>
+        </div>
+        <div class="toggle on" id="tog-hint" onclick="toggleHint()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="bottom-bar-inner">
+      <button class="btn-primary" id="el-start-btn" onclick="startGame()">
+        <span>▶</span> Start Game
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ REVEAL SCREEN ═══════════════ -->
+<div id="screen-reveal" class="screen">
+  <button class="x-btn" onclick="confirmEnd()">✕</button>
+
+  <div style="text-align:center;flex-shrink:0">
+    <img src="/ce8ce513-d59c-4ed8-ad1b-b952f2996e06_removalai_preview.png" class="logo-img-mini" alt="IMPOSTER">
+  </div>
+
+  <div style="text-align:center;flex-shrink:0">
+    <div class="reveal-name" id="rev-name">Player</div>
+    <div class="reveal-hint" id="el-reveal-hint">Your turn — check your card privately</div>
+  </div>
+
+  <div class="card-wrap">
+    <div class="rev-card" id="rev-card"
+         onmousedown="onHoldStart(event)" onmouseup="onHoldEnd(event)" onmouseleave="onHoldEnd(event)"
+         ontouchstart="onHoldStart(event)" ontouchend="onHoldEnd(event)" ontouchcancel="onHoldEnd(event)">
+      <div class="role-face" id="role-face"></div>
+      <div class="shutter" id="shutter"></div>
+      <div class="card-front" id="card-front">
+        <div class="ring-wrap" id="ring-wrap">
+          <div class="icon">✋</div>
+          <svg width="68" height="68" viewBox="0 0 68 68">
+            <circle class="ring-bg" cx="34" cy="34" r="30"/>
+            <circle class="ring-fill" id="ring-fill" cx="34" cy="34" r="30"/>
+          </svg>
+        </div>
+        <div class="hold-text" id="el-hold-text">Press &amp; hold to reveal</div>
+        <div class="hold-sub" id="el-hold-sub">Keep your card private</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dots-row" id="dots-row"></div>
+
+  <button class="btn-next" id="btn-next" onclick="nextPlayer()">
+    Next Player <span style="font-size:19px">▶|</span>
+  </button>
+</div>
+
+<!-- ═══════════════ GAME SCREEN ═══════════════ -->
+<div id="screen-game" class="screen">
+  <button class="x-btn" onclick="confirmEnd()">✕</button>
+  <div style="flex-shrink:0;text-align:center">
+    <img src="/ce8ce513-d59c-4ed8-ad1b-b952f2996e06_removalai_preview.png" class="logo-img-mini" alt="IMPOSTER">
+  </div>
+  <div>
+    <div class="tag" id="el-game-tag">Round in progress</div>
+    <div class="game-title" id="el-game-title" style="margin-top:14px">Discuss &amp;<br>Find Them</div>
+    <div class="game-sub" id="el-game-sub">Each player says one word related to the<br>secret word — don't say it directly!<br>The imposter must bluff without knowing it.</div>
+  </div>
+  <div class="players-mini" id="game-players"></div>
+  <div style="width:100%;max-width:400px">
+    <button class="btn-danger" id="el-reveal-btn" onclick="showResults()"><span>🎭</span> Reveal the Imposter!</button>
+  </div>
+</div>
+
+<!-- ═══════════════ RESULTS SCREEN ═══════════════ -->
+<div id="screen-results" class="screen">
+  <div style="flex-shrink:0;text-align:center">
+    <img src="/ce8ce513-d59c-4ed8-ad1b-b952f2996e06_removalai_preview.png" class="logo-img-mini" alt="IMPOSTER">
+  </div>
+  <div>
+    <div class="results-label" id="el-imp-was">The Imposter Was</div>
+    <div class="imposter-name" id="res-imp">—</div>
+  </div>
+  <div>
+    <div class="results-label" id="el-word-was">The Secret Word Was</div>
+    <div class="result-word" id="res-word">—</div>
+  </div>
+  <div id="res-clue-wrap" style="display:none">
+    <div class="tag" id="el-hint-was">Imposter's hint was</div>
+    <div class="result-clue" id="res-clue">—</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:400px">
+    <button class="btn-primary" id="el-play-again" onclick="playAgain()"><span>🔁</span> Play Again</button>
+    <button class="btn-secondary" id="el-go-home" onclick="goHome()">← Home</button>
+  </div>
+</div>
+
+<!-- ═══════════════ HOW TO PLAY MODAL ═══════════════ -->
+<div id="how-to-play" class="modal-bg">
+  <div class="modal">
+    <div class="modal-title" id="el-modal-title">How to Play</div>
+    <button class="modal-x" onclick="closeModal('how-to-play')">✕</button>
+    <div id="el-modal-body">
+      <p><strong>1. Setup</strong> — Add at least 3 players and pick your word categories.</p>
+      <p><strong>2. Get your card</strong> — Each player privately holds their card to reveal it. Most see the secret word. The imposter sees a hint word instead.</p>
+      <p><strong>3. Discuss</strong> — Going around, each player says ONE word that relates to the secret word (without saying it directly). The imposter must bluff!</p>
+      <p><strong>4. Vote</strong> — After everyone speaks, vote on who you think the imposter is.</p>
+      <p><strong>5. Reveal</strong> — Find out if you caught the imposter!</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// LANGUAGE DATA
+// ══════════════════════════════════════════
+const LANG_DATA = {
+  en: {
+    cats:['🍕 Food','🐾 Animals','🌍 Places','🏠 Objects','⚽ Sports','🎬 Movies & TV','🎵 Music','🔬 Science'],
+    words:{
+      '🍕 Food':[{w:'Pizza',c:'Napoli'},{w:'Sushi',c:'Wasabi'},{w:'Burger',c:'Ketchup'},
+        {w:'Tacos',c:'Salsa'},{w:'Ramen',c:'Umami'},{w:'Chocolate',c:'Cacao'},
+        {w:'Ice Cream',c:'Sundae'},{w:'Pancakes',c:'Maple'},{w:'Donuts',c:'Homer'},
+        {w:'Spaghetti',c:'Meatball'},{w:'Croissant',c:'Bakery'},{w:'Cheesecake',c:'Graham'},
+        {w:'Nachos',c:'Jalapeño'},{w:'Curry',c:'Turmeric'},{w:'Waffles',c:'Brunch'}],
+      '🐾 Animals':[{w:'Elephant',c:'Ivory'},{w:'Dolphin',c:'Sonar'},{w:'Tiger',c:'Bengal'},
+        {w:'Penguin',c:'Tuxedo'},{w:'Giraffe',c:'Savanna'},{w:'Octopus',c:'Ink'},
+        {w:'Wolf',c:'Howl'},{w:'Parrot',c:'Pirate'},{w:'Shark',c:'Fin'},
+        {w:'Kangaroo',c:'Joey'},{w:'Panda',c:'Bamboo'},{w:'Fox',c:'Den'},
+        {w:'Owl',c:'Hoot'},{w:'Koala',c:'Eucalyptus'},{w:'Cheetah',c:'Namibia'}],
+      '🌍 Places':[{w:'Paris',c:'Baguette'},{w:'Amazon',c:'Piranha'},{w:'Tokyo',c:'Sushi'},
+        {w:'Sahara',c:'Bedouin'},{w:'Venice',c:'Gondola'},{w:'Antarctica',c:'Penguin'},
+        {w:'Machu Picchu',c:'Inca'},{w:'New York',c:'Broadway'},{w:'Sydney',c:'Harbour'},
+        {w:'Niagara',c:'Horseshoe'},{w:'Rome',c:'Caesar'},{w:'Dubai',c:'Sheikh'},
+        {w:'Hawaii',c:'Aloha'},{w:'Everest',c:'Sherpa'},{w:'Greenland',c:'Viking'}],
+      '🏠 Objects':[{w:'Umbrella',c:'Parasol'},{w:'Mirror',c:'Vanity'},{w:'Scissors',c:'Barber'},
+        {w:'Candle',c:'Wick'},{w:'Backpack',c:'Hiker'},{w:'Hammer',c:'Carpenter'},
+        {w:'Camera',c:'Shutter'},{w:'Glasses',c:'Optician'},{w:'Pillow',c:'Feather'},
+        {w:'Compass',c:'Navigator'},{w:'Lantern',c:'Kerosene'},{w:'Telescope',c:'Galileo'},
+        {w:'Clock',c:'Pendulum'},{w:'Keyboard',c:'Qwerty'},{w:'Thermometer',c:'Mercury'}],
+      '⚽ Sports':[{w:'Soccer',c:'Penalty'},{w:'Basketball',c:'Dribble'},{w:'Swimming',c:'Chlorine'},
+        {w:'Tennis',c:'Wimbledon'},{w:'Boxing',c:'Knockout'},{w:'Skiing',c:'Mogul'},
+        {w:'Golf',c:'Birdie'},{w:'Surfing',c:'Barrel'},{w:'Archery',c:'Quiver'},
+        {w:'Gymnastics',c:'Cartwheel'},{w:'Wrestling',c:'Takedown'},{w:'Cycling',c:'Peloton'},
+        {w:'Volleyball',c:'Block'},{w:'Baseball',c:'Inning'},{w:'Fencing',c:'Parry'}],
+      '🎬 Movies & TV':[{w:'Titanic',c:'Iceberg'},{w:'Inception',c:'Limbo'},{w:'Frozen',c:'Elsa'},
+        {w:'Batman',c:'Gotham'},{w:'Avatar',c:'Pandora'},{w:'Star Wars',c:'Lightsaber'},
+        {w:'Harry Potter',c:'Hogwarts'},{w:'Friends',c:'Gunther'},{w:'Jurassic Park',c:'Raptor'},
+        {w:'The Matrix',c:'Neo'},{w:'Toy Story',c:'Woody'},{w:'Shrek',c:'Donkey'},
+        {w:'Interstellar',c:'Tesseract'},{w:'Joker',c:'Arkham'},{w:'Avengers',c:'Infinity'}],
+      '🎵 Music':[{w:'Guitar',c:'Fret'},{w:'Piano',c:'Sonata'},{w:'Drums',c:'Snare'},
+        {w:'Jazz',c:'Bebop'},{w:'Concert',c:'Encore'},{w:'Vinyl',c:'Groove'},
+        {w:'Microphone',c:'Feedback'},{w:'Orchestra',c:'Maestro'},{w:'Hip-Hop',c:'Freestyle'},
+        {w:'Choir',c:'Soprano'},{w:'Violin',c:'Stradivari'},{w:'Saxophone',c:'Coltrane'},
+        {w:'DJ',c:'Turntable'},{w:'Karaoke',c:'Pitch'},{w:'Bass',c:'Subwoofer'}],
+      '🔬 Science':[{w:'Volcano',c:'Magma'},{w:'Rainbow',c:'Prism'},{w:'DNA',c:'Helix'},
+        {w:'Black Hole',c:'Singularity'},{w:'Lightning',c:'Thor'},{w:'Tornado',c:'Dorothy'},
+        {w:'Meteor',c:'Crater'},{w:'Glacier',c:'Moraine'},{w:'Northern Lights',c:'Aurora'},
+        {w:'Earthquake',c:'Richter'},{w:'Coral Reef',c:'Clownfish'},{w:'Solar Eclipse',c:'Corona'},
+        {w:'Tsunami',c:'Tectonic'},{w:'Atom',c:'Proton'},{w:'Photosynthesis',c:'Chlorophyll'}],
+    },
+    ui:{
+      dir:'ltr',lang:'en',
+      tagline:'The word game where one of you is lying.',
+      players:'Players', nPlayers:n=>`${n} player${n!==1?'s':''}`,
+      addText:'Add Player', playerPlh:i=>`Player ${i+1}`,
+      wordCats:'Word Categories', imposters:'Imposters',
+      impostersDesc:'Number of imposters per round',
+      hintLabel:'Imposter Hint', hintDesc:'Give the imposter a related clue word to help blend in.',
+      startGame:'Start Game',
+      revealHint:'Your turn — check your card privately',
+      holdText:'Press & hold to reveal', holdSub:'Keep your card private',
+      nextPlayer:'Next Player <span style="font-size:19px">▶|</span>',
+      startDiscussion:'Start Discussion <span style="font-size:19px">▶</span>',
+      roundTag:'Round in progress',
+      gameTitle:'Discuss &amp;<br>Find Them',
+      gameSub:"Each player says one word related to the<br>secret word — don't say it directly!<br>The imposter must bluff without knowing it.",
+      revealBtn:'🎭 Reveal the Imposter!',
+      impWas:'The Imposter Was', wordWas:'The Secret Word Was', hintWas:"Imposter's hint was",
+      playAgain:'🔁 Play Again', goHome:'← Home',
+      minPlayers:'You need at least 3 players!', minCats:'Keep at least one category!',
+      youAreImp:'YOU ARE THE<br>IMPOSTER!',
+      yourHint:'Your hint word', useBlend:"Use it to blend in — don't reveal it!",
+      noWord:'You have no word — blend in by bluffing!',
+      secretWordIs:'The secret word is', dontSay:"Don't say it directly — blend your clues!",
+      modalTitle:'How to Play',
+      modalBody:`<p><strong>1. Setup</strong> — Add at least 3 players and pick your word categories.</p>
+        <p><strong>2. Get your card</strong> — Each player privately holds their card to reveal it. Most see the secret word. The imposter sees a hint word instead.</p>
+        <p><strong>3. Discuss</strong> — Going around, each player says ONE word that relates to the secret word (without saying it directly). The imposter must bluff!</p>
+        <p><strong>4. Vote</strong> — After everyone speaks, vote on who you think the imposter is.</p>
+        <p><strong>5. Reveal</strong> — Find out if you caught the imposter!</p>`,
+    }
+  },
+  he: {
+    cats:['🍕 אוכל','🐾 חיות','🌍 מקומות','🏠 חפצים','⚽ ספורט','🎬 סרטים','🎵 מוזיקה','🔬 מדע'],
+    words:{
+      '🍕 אוכל':[{w:'פיצה',c:'נאפולי'},{w:'סושי',c:'וואסאבי'},{w:'המבורגר',c:'קטשופ'},
+        {w:'טאקו',c:'סלסה'},{w:'רמן',c:'אטריות'},{w:'שוקולד',c:'קקאו'},
+        {w:'גלידה',c:'שמנת'},{w:'פנקייק',c:'מייפל'},{w:'סופגנייה',c:'ריבה'},
+        {w:'ספגטי',c:'פסטה'},{w:'קרואסון',c:'פריז'},{w:'עוגת גבינה',c:'גרהם'},
+        {w:"נאצ'וס",c:'חלפניו'},{w:'קארי',c:'כורכום'},{w:'וופל',c:'בלגיה'}],
+      '🐾 חיות':[{w:'פיל',c:'שנהב'},{w:'דולפין',c:'סנפיר'},{w:'נמר',c:'בנגל'},
+        {w:'פינגווין',c:'אנטארקטיקה'},{w:"ג'ירפה",c:'סוואנה'},{w:'תמנון',c:'דיו'},
+        {w:'זאב',c:'יללה'},{w:'תוכי',c:'פיראט'},{w:'כריש',c:'לסת'},
+        {w:'קנגורו',c:'שקיק'},{w:'פנדה',c:'במבוק'},{w:'שועל',c:'מאורה'},
+        {w:'ינשוף',c:'לילה'},{w:'קואלה',c:'אוסטרליה'},{w:'גמל',c:'מדבר'}],
+      '🌍 מקומות':[{w:'פריז',c:'באגט'},{w:'אמזונס',c:'פיראניה'},{w:'טוקיו',c:'סושי'},
+        {w:'סהרה',c:'בדואי'},{w:'ונציה',c:'גונדולה'},{w:'אנטארקטיקה',c:'פינגווין'},
+        {w:"מאצ'ו פיצ'ו",c:'אינקה'},{w:'ניו יורק',c:'ברודוויי'},{w:'סידני',c:'נמל'},
+        {w:'ניאגרה',c:'פרסה'},{w:'רומא',c:'קיסר'},{w:'דובאי',c:'שיח'},
+        {w:'הוואי',c:'אלוהה'},{w:'אוורסט',c:'שרפה'},{w:'גרינלנד',c:'ויקינג'}],
+      '🏠 חפצים':[{w:'מטרייה',c:'גשם'},{w:'מראה',c:'יופי'},{w:'מספריים',c:'ספר'},
+        {w:'נר',c:'פתיל'},{w:'תרמיל',c:'מטייל'},{w:'פטיש',c:'נגר'},
+        {w:'מצלמה',c:'תריס'},{w:'משקפיים',c:'עדשה'},{w:'כרית',c:'נוצה'},
+        {w:'מצפן',c:'צפון'},{w:'פנס',c:'נפט'},{w:'טלסקופ',c:'גלילאו'},
+        {w:'שעון',c:'מטוטלת'},{w:'מקלדת',c:'קוורטי'},{w:'מד חום',c:'כספית'}],
+      '⚽ ספורט':[{w:'כדורגל',c:'פנדל'},{w:'כדורסל',c:'דריבל'},{w:'שחייה',c:'כלור'},
+        {w:'טניס',c:'וימבלדון'},{w:'אגרוף',c:'נוקאאוט'},{w:'סקי',c:'שלג'},
+        {w:'גולף',c:'בירדי'},{w:'גלישה',c:'גל'},{w:'קשתות',c:'חץ'},
+        {w:'התעמלות',c:'גלגל'},{w:'היאבקות',c:'מזרן'},{w:'רכיבה',c:'פלוטון'},
+        {w:'כדורעף',c:'רשת'},{w:'בייסבול',c:'אינינג'},{w:'סייף',c:'פרי'}],
+      '🎬 סרטים':[{w:'טיטאניק',c:'קרחון'},{w:'אינספשן',c:'לימבו'},{w:'פרוזן',c:'אלזה'},
+        {w:'באטמן',c:"גות'ם"},{w:'אווטאר',c:'פנדורה'},{w:'מלחמת הכוכבים',c:"ג'דיי"},
+        {w:'הארי פוטר',c:'הוגוורטס'},{w:'חברים',c:'קפה'},{w:'פארק יורה',c:'ראפטור'},
+        {w:'המטריקס',c:'ניאו'},{w:'צעצועי סיפור',c:'וודי'},{w:'שרק',c:'חמור'},
+        {w:'אינטרסטלאר',c:'תולעת'},{w:"הג'וקר",c:'ארקהם'},{w:'נוקמים',c:"ת'אנוס"}],
+      '🎵 מוזיקה':[{w:'גיטרה',c:'פרט'},{w:'פסנתר',c:'סונטה'},{w:'תופים',c:'סנר'},
+        {w:"ג'אז",c:'ביבופ'},{w:'קונצרט',c:'אנקור'},{w:'ויניל',c:'תלם'},
+        {w:'מיקרופון',c:'הד'},{w:'תזמורת',c:'מאסטרו'},{w:'היפ-הופ',c:'פריסטייל'},
+        {w:'מקהלה',c:'סופרן'},{w:'כינור',c:'סטרדיווארי'},{w:'סקסופון',c:'קולטריין'},
+        {w:"דיג'יי",c:'תקליט'},{w:'קריוקי',c:'צליל'},{w:'בס',c:'סאב-וופר'}],
+      '🔬 מדע':[{w:'הר געש',c:'מגמה'},{w:'קשת בענן',c:'פריזמה'},{w:'DNA',c:'סליל'},
+        {w:'חור שחור',c:'סינגולריות'},{w:'ברק',c:'רעם'},{w:'טורנדו',c:'סופה'},
+        {w:'מטאור',c:'מכתש'},{w:'קרחון',c:'מורן'},{w:'זוהר צפוני',c:'אורורה'},
+        {w:'רעידת אדמה',c:'ריכטר'},{w:'שונית',c:'דג ליצן'},{w:'ליקוי חמה',c:'קורונה'},
+        {w:'צונאמי',c:'טקטוני'},{w:'אטום',c:'פרוטון'},{w:'פוטוסינתזה',c:'כלורופיל'}],
+    },
+    ui:{
+      dir:'rtl',lang:'he',
+      tagline:'משחק המילים שבו אחד מכם משקר.',
+      players:'שחקנים', nPlayers:n=>`${n} שחקנ${n!==1?'ים':''}`,
+      addText:'הוסף שחקן', playerPlh:i=>`שחקן ${i+1}`,
+      wordCats:'קטגוריות מילים', imposters:'מתחזים',
+      impostersDesc:'מספר מתחזים בכל סיבוב',
+      hintLabel:'רמז למתחזה', hintDesc:'תן למתחזה מילת רמז קשורה שתעזור לו להתמזג.',
+      startGame:'התחל משחק',
+      revealHint:'תורך — בדוק את הקלף שלך בפרטיות',
+      holdText:'לחץ והחזק לחשיפה', holdSub:'שמור על הקלף שלך פרטי',
+      nextPlayer:'שחקן הבא <span style="font-size:19px">◀|</span>',
+      startDiscussion:'התחל דיון <span style="font-size:19px">◀</span>',
+      roundTag:'סיבוב בתהליך',
+      gameTitle:'דונו<br>ומצאו אותם',
+      gameSub:'כל שחקן אומר מילה אחת הקשורה למילה הסודית — אל תגידו אותה ישירות!<br>המתחזה חייב לבלף בלי לדעת אותה.',
+      revealBtn:'🎭 חשוף את המתחזה!',
+      impWas:'המתחזה היה', wordWas:'המילה הסודית הייתה', hintWas:'הרמז של המתחזה היה',
+      playAgain:'🔁 שחק שוב', goHome:'→ בית',
+      minPlayers:'צריך לפחות 3 שחקנים!', minCats:'השאר לפחות קטגוריה אחת!',
+      youAreImp:'אתה<br>המתחזה!',
+      yourHint:'מילת הרמז שלך', useBlend:'השתמש בה כדי להתמזג — אל תחשוף אותה!',
+      noWord:'אין לך מילה — התמזג על ידי בלוף!',
+      secretWordIs:'המילה הסודית היא', dontSay:'אל תגיד ישירות — ערבב את הרמזים שלך!',
+      modalTitle:'איך משחקים',
+      modalBody:`<p><strong>1. הגדרה</strong> — הוסף לפחות 3 שחקנים ובחר קטגוריות מילים.</p>
+        <p><strong>2. קבל את הקלף שלך</strong> — כל שחקן מחזיק בפרטיות את הקלף שלו לחשיפה. רוב השחקנים רואים את המילה הסודית. המתחזה רואה מילת רמז במקום.</p>
+        <p><strong>3. דון</strong> — בתורות, כל שחקן אומר מילה אחת שקשורה למילה הסודית (בלי לומר אותה ישירות). המתחזה חייב לבלף!</p>
+        <p><strong>4. הצבע</strong> — אחרי שכולם דיברו, הצביעו על מי שאתם חושבים שהוא המתחזה.</p>
+        <p><strong>5. חשיפה</strong> — גלו אם תפסתם את המתחזה!</p>`,
+    }
+  }
+};
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let G = {
+  lang: 'en',
+  players: [],
+  selCats: [],
+  impCount: 1,
+  hintOn: true,
+  roles: [],
+  revOrder: [],
+  curIdx: 0,
+  word: '',
+  clue: '',
+  round: 0,
+};
+
+function ui() { return LANG_DATA[G.lang].ui; }
+function words() { return LANG_DATA[G.lang].words; }
+function cats() { return LANG_DATA[G.lang].cats; }
+
+// ══════════════════════════════════════════
+// LANGUAGE SWITCHER
+// ══════════════════════════════════════════
+function switchLang(code) {
+  G.lang = code;
+  const u = ui();
+  const html = document.documentElement;
+  html.lang = code;
+  html.dir = u.dir;
+
+  // update lang buttons
+  document.getElementById('lang-en').classList.toggle('active', code === 'en');
+  document.getElementById('lang-he').classList.toggle('active', code === 'he');
+
+  // static UI elements
+  document.getElementById('el-tagline').textContent = u.tagline;
+  document.getElementById('el-players-title').textContent = u.players;
+  document.getElementById('el-add-text').textContent = u.addText;
+  document.getElementById('el-cats-title').textContent = u.wordCats;
+  document.getElementById('el-imps-title').textContent = u.imposters;
+  document.getElementById('el-imps-desc').textContent = u.impostersDesc;
+  document.getElementById('el-hint-label').textContent = u.hintLabel;
+  document.getElementById('el-hint-desc').textContent = u.hintDesc;
+  document.getElementById('el-start-btn').innerHTML = `<span>▶</span> ${u.startGame}`;
+  document.getElementById('el-reveal-hint').textContent = u.revealHint;
+  document.getElementById('el-hold-text').innerHTML = u.holdText;
+  document.getElementById('el-hold-sub').textContent = u.holdSub;
+  document.getElementById('el-game-tag').textContent = u.roundTag;
+  document.getElementById('el-game-title').innerHTML = u.gameTitle;
+  document.getElementById('el-game-sub').innerHTML = u.gameSub;
+  document.getElementById('el-reveal-btn').innerHTML = u.revealBtn;
+  document.getElementById('el-imp-was').textContent = u.impWas;
+  document.getElementById('el-word-was').textContent = u.wordWas;
+  document.getElementById('el-hint-was').textContent = u.hintWas;
+  document.getElementById('el-play-again').innerHTML = u.playAgain;
+  document.getElementById('el-go-home').textContent = u.goHome;
+  document.getElementById('el-modal-title').textContent = u.modalTitle;
+  document.getElementById('el-modal-body').innerHTML = u.modalBody;
+
+  // re-render player count label
+  updateCount();
+
+  // re-render categories in new language (preserve selection ratio)
+  const prevCats = cats();
+  G.selCats = [...cats()];
+  renderCategories();
+}
+
+// ══════════════════════════════════════════
+// SHUTTER
+// ══════════════════════════════════════════
+const N_STRIPS = 8;
+let holdStartTime = null;
+let holdRaf = null;
+let cardOpen = false;
+const HOLD_MS = 380;
+const RING_C = 188;
+
+function buildShutter() {
+  const el = document.getElementById('shutter');
+  el.innerHTML = '';
+  for (let i = 0; i < N_STRIPS; i++) {
+    const s = document.createElement('div');
+    s.className = 's-strip';
+    s.style.cssText = `top:${(i/N_STRIPS)*100}%;height:${100/N_STRIPS+0.3}%;`;
+    el.appendChild(s);
+  }
+}
+
+function openShutter() {
+  cardOpen = true;
+  const strips = [...document.querySelectorAll('.s-strip')];
+  strips.forEach((s, i) => {
+    const dist = Math.abs(i - (N_STRIPS/2 - 0.5));
+    setTimeout(() => {
+      s.style.transition = 'transform 0.12s cubic-bezier(0.4,0,0.2,1)';
+      s.style.transformOrigin = 'top center';
+      s.style.transform = 'scaleY(0)';
+    }, dist * 28);
+  });
+  setTimeout(() => {
+    document.getElementById('card-front').classList.add('gone');
+  }, (N_STRIPS/2) * 28 + 120);
+}
+
+function closeShutter() {
+  cardOpen = false;
+  document.getElementById('card-front').classList.remove('gone');
+  const strips = [...document.querySelectorAll('.s-strip')];
+  strips.forEach((s, i) => {
+    const dist = Math.abs(i - (N_STRIPS/2 - 0.5));
+    setTimeout(() => {
+      s.style.transition = 'transform 0.1s cubic-bezier(0.4,0,1,1)';
+      s.style.transformOrigin = 'top center';
+      s.style.transform = 'scaleY(1)';
+    }, dist * 18);
+  });
+}
+
+function resetShutter() {
+  cardOpen = false;
+  const strips = document.querySelectorAll('.s-strip');
+  strips.forEach(s => {
+    s.style.transition = 'none';
+    s.style.transform = 'scaleY(1)';
+  });
+  document.getElementById('card-front').classList.remove('gone');
+  document.getElementById('ring-fill').style.strokeDashoffset = RING_C;
+  document.getElementById('rev-card').classList.remove('holding');
+}
+
+// ══════════════════════════════════════════
+// HOLD MECHANIC
+// ══════════════════════════════════════════
+function onHoldStart(e) {
+  e.preventDefault();
+  if (holdStartTime) return;
+  holdStartTime = Date.now();
+  document.getElementById('rev-card').classList.add('holding');
+  holdRaf = requestAnimationFrame(rafLoop);
+}
+
+function rafLoop() {
+  if (!holdStartTime) return;
+  const elapsed = Date.now() - holdStartTime;
+  const p = Math.min(elapsed / HOLD_MS, 1);
+  document.getElementById('ring-fill').style.strokeDashoffset = RING_C * (1 - p);
+  if (p >= 1 && !cardOpen) {
+    holdRaf = null;
+    document.getElementById('rev-card').classList.remove('holding');
+    openShutter();
+  } else if (!cardOpen) {
+    holdRaf = requestAnimationFrame(rafLoop);
+  }
+}
+
+function onHoldEnd(e) {
+  holdStartTime = null;
+  if (holdRaf) { cancelAnimationFrame(holdRaf); holdRaf = null; }
+  document.getElementById('ring-fill').style.strokeDashoffset = RING_C;
+  document.getElementById('rev-card').classList.remove('holding');
+  if (cardOpen) closeShutter();
+}
+
+// ══════════════════════════════════════════
+// HOME SCREEN
+// ══════════════════════════════════════════
+function renderPlayers() {
+  const el = document.getElementById('player-list');
+  el.innerHTML = '';
+  G.players.forEach((name, i) => {
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    row.innerHTML = `
+      <div class="player-num">${i+1}</div>
+      <input class="player-input" type="text" placeholder="${ui().playerPlh(i)}" value="${escHtml(name)}"
+             oninput="G.players[${i}]=this.value;updateCount()" maxlength="18" autocomplete="off">
+      <button class="btn-rm" onclick="removePlayer(${i})" aria-label="Remove">✕</button>`;
+    el.appendChild(row);
+  });
+  updateCount();
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+function updateCount() {
+  const n = G.players.length;
+  document.getElementById('player-count-lbl').textContent = ui().nPlayers(n);
+  const add = document.getElementById('btn-add');
+  add.style.opacity = n >= 12 ? '0.4' : '1';
+  add.style.pointerEvents = n >= 12 ? 'none' : '';
+  // clamp impCount to new max and refresh buttons
+  G.impCount = Math.max(1, Math.min(impMax(), G.impCount));
+  document.getElementById('imp-val').textContent = G.impCount;
+  updateImpButtons();
+}
+
+function addPlayer() {
+  if (G.players.length >= 12) return;
+  G.players.push('');
+  renderPlayers();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.player-input');
+    inputs[inputs.length - 1].focus();
+  }, 60);
+}
+
+function removePlayer(i) {
+  G.players.splice(i, 1);
+  renderPlayers();
+}
+
+function renderCategories() {
+  const el = document.getElementById('cat-grid');
+  el.innerHTML = '';
+  cats().forEach(cat => {
+    const pill = document.createElement('div');
+    pill.className = 'cat-pill' + (G.selCats.includes(cat) ? ' sel' : '');
+    pill.textContent = cat;
+    pill.onclick = () => toggleCat(cat, pill);
+    el.appendChild(pill);
+  });
+}
+
+function toggleCat(cat, el) {
+  const idx = G.selCats.indexOf(cat);
+  if (idx === -1) {
+    G.selCats.push(cat);
+    el.classList.add('sel');
+  } else {
+    if (G.selCats.length <= 1) { shake(el); toast(ui().minCats); return; }
+    G.selCats.splice(idx, 1);
+    el.classList.remove('sel');
+  }
+}
+
+function impMax() {
+  // Max 1 imposter per 3 players, always at least 1 less than player count
+  const n = G.players.length;
+  return Math.max(1, Math.min(Math.floor(n / 3), n - 2));
+}
+
+function changeImp(d) {
+  G.impCount = Math.max(1, Math.min(impMax(), G.impCount + d));
+  document.getElementById('imp-val').textContent = G.impCount;
+  updateImpButtons();
+}
+
+function updateImpButtons() {
+  const max = impMax();
+  const minus = document.getElementById('btn-imp-minus');
+  const plus = document.getElementById('btn-imp-plus');
+  if (!minus || !plus) return;
+  minus.style.opacity = G.impCount <= 1 ? '0.3' : '1';
+  minus.style.pointerEvents = G.impCount <= 1 ? 'none' : '';
+  plus.style.opacity = G.impCount >= max ? '0.3' : '1';
+  plus.style.pointerEvents = G.impCount >= max ? 'none' : '';
+}
+
+function toggleHint() {
+  G.hintOn = !G.hintOn;
+  document.getElementById('tog-hint').classList.toggle('on', G.hintOn);
+}
+
+// ══════════════════════════════════════════
+// GAME LOGIC
+// ══════════════════════════════════════════
+function startGame() {
+  const named = G.players.map(p => p.trim()).filter(Boolean);
+  if (named.length < 3) {
+    shake(document.getElementById('players-card'));
+    toast(ui().minPlayers);
+    return;
+  }
+  G.players = named;
+  G.impCount = Math.max(1, Math.min(impMax(), G.impCount));
+  document.getElementById('imp-val').textContent = G.impCount;
+
+  const availCats = G.selCats.filter(c => words()[c]);
+  const cat = availCats[Math.floor(Math.random() * availCats.length)];
+  const wlist = words()[cat];
+  const pick = wlist[Math.floor(Math.random() * wlist.length)];
+  G.word = pick.w;
+  G.clue = pick.c;
+
+  const indices = shuffle([...Array(G.players.length).keys()]);
+  const impSet = new Set(indices.slice(0, G.impCount));
+  G.roles = G.players.map((_, i) => impSet.has(i) ? 'imp' : 'reg');
+
+  G.revOrder = shuffle([...Array(G.players.length).keys()]);
+  G.curIdx = 0;
+  G.round++;
+
+  showScreen('reveal');
+  setupReveal();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ══════════════════════════════════════════
+// REVEAL SCREEN
+// ══════════════════════════════════════════
+function setupReveal() {
+  buildShutter();
+  loadPlayer();
+}
+
+function loadPlayer() {
+  resetShutter();
+  const pi = G.revOrder[G.curIdx];
+  const name = G.players[pi];
+  const role = G.roles[pi];
+  const u = ui();
+
+  document.getElementById('rev-name').textContent = name;
+
+  const isLast = G.curIdx === G.players.length - 1;
+  document.getElementById('btn-next').innerHTML = isLast ? u.startDiscussion : u.nextPlayer;
+
+  const face = document.getElementById('role-face');
+  if (role === 'imp') {
+    face.className = 'role-face imp';
+    face.innerHTML = `
+      <div class="role-title">${u.youAreImp}</div>
+      ${G.hintOn ? `
+        <div class="role-sub" style="margin-top:10px">${u.yourHint}</div>
+        <div class="role-word">${escHtml(G.clue)}</div>
+        <div class="role-clue-note">${u.useBlend}</div>
+      ` : `
+        <div class="role-clue-note" style="font-size:15px;font-weight:700;color:rgba(0,0,0,.65);margin-top:12px">${u.noWord}</div>
+      `}
+    `;
+  } else {
+    face.className = 'role-face reg';
+    face.innerHTML = `
+      <div class="role-sub">${u.secretWordIs}</div>
+      <div class="role-word">${escHtml(G.word)}</div>
+      <div class="role-clue-note">${u.dontSay}</div>
+    `;
+  }
+
+  renderDots();
+}
+
+function renderDots() {
+  const el = document.getElementById('dots-row');
+  el.innerHTML = '';
+  G.players.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < G.curIdx ? ' done' : '') + (i === G.curIdx ? ' cur' : '');
+    el.appendChild(d);
+  });
+}
+
+function nextPlayer() {
+  G.curIdx++;
+  if (G.curIdx >= G.players.length) {
+    showScreen('game');
+    setupGame();
+  } else {
+    loadPlayer();
+  }
+}
+
+// ══════════════════════════════════════════
+// GAME SCREEN
+// ══════════════════════════════════════════
+function setupGame() {
+  const el = document.getElementById('game-players');
+  el.innerHTML = '';
+  G.players.forEach(name => {
+    const chip = document.createElement('div');
+    chip.className = 'p-chip';
+    chip.textContent = name;
+    el.appendChild(chip);
+  });
+}
+
+// ══════════════════════════════════════════
+// RESULTS SCREEN
+// ══════════════════════════════════════════
+function showResults() {
+  const impNames = G.players.filter((_, i) => G.roles[i] === 'imp');
+  document.getElementById('res-imp').textContent = impNames.join(' & ');
+  document.getElementById('res-word').textContent = G.word;
+  const cw = document.getElementById('res-clue-wrap');
+  if (G.hintOn) {
+    cw.style.display = '';
+    document.getElementById('res-clue').textContent = G.clue;
+  } else {
+    cw.style.display = 'none';
+  }
+  showScreen('results');
+}
+
+function playAgain() {
+  const availCats = G.selCats.filter(c => words()[c]);
+  const cat = availCats[Math.floor(Math.random() * availCats.length)];
+  const wlist = words()[cat];
+  const pick = wlist[Math.floor(Math.random() * wlist.length)];
+  G.word = pick.w;
+  G.clue = pick.c;
+
+  const indices = shuffle([...Array(G.players.length).keys()]);
+  const impSet = new Set(indices.slice(0, G.impCount));
+  G.roles = G.players.map((_, i) => impSet.has(i) ? 'imp' : 'reg');
+  G.revOrder = shuffle([...Array(G.players.length).keys()]);
+  G.curIdx = 0;
+  G.round++;
+
+  showScreen('reveal');
+  setupReveal();
+}
+
+function goHome() {
+  showScreen('home');
+}
+
+function confirmEnd() {
+  if (confirm('End the current game and return home?')) goHome();
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ══════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
+});
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function toast(msg) {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
+function shake(el) {
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+  el.addEventListener('animationend', () => el.classList.remove('shake'), {once:true});
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+(function init() {
+  G.selCats = [...LANG_DATA.en.cats];
+  G.players = ['', '', ''];
+  renderPlayers();
+  renderCategories();
+})();
+</script>
+</body>
+</html>
